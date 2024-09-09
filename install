@@ -1,0 +1,20 @@
+#!/bin/sh
+PACKAGE_NAME="moonlight"
+PACKAGE_VERSION="dev-1"
+DISTRO="linux-x64"
+
+# Uncomment this to install necessary C/dev libraries
+# May need to change to your distro's package manager
+sudo apt install -y build-essential cmake
+
+# If you need to install mprocs, you can use this
+# npm i -g mprocs
+
+if [ ! -d "./.lua" ]; then
+    echo "Installing localua"
+    curl https://loadk.com/localua.sh | bash -s .lua
+fi
+
+echo "Installing rocks from rockspec"
+.lua/bin/luarocks install --only-deps --tree=.lua --local \
+    ./$PACKAGE_NAME-$PACKAGE_VERSION.rockspec
