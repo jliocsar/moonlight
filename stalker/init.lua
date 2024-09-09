@@ -1,0 +1,1 @@
+print("Stalker mod utils")
