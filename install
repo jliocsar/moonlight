@@ -5,7 +5,7 @@ DISTRO="linux-x64"
 
 # Uncomment this to install necessary C/dev libraries
 # May need to change to your distro's package manager
-sudo apt install -y build-essential cmake
+sudo apt install -y build-essential cmake libyaml-dev
 
 # If you need to install mprocs, you can use this
 # npm i -g mprocs

@@ -3,7 +3,15 @@ local Cli = require "lib.cli"
 
 local args = { ... }
 local cmd = args[1]
-local cli = Cli:new(args)
+local cli = Cli:new {
+    args = args,
+    opts = {
+        help = {
+            short = "h",
+            desc = "Prints this help message",
+        }
+    }
+}
 
 local function readDirAndMatchReplaceFiles(fpath, pattern, replace)
     local iter, dir_obj = lfs.dir(fpath)
@@ -144,7 +152,7 @@ end
 
 if cmd == [[stalker]] then
     local Stalker = require "stalker"
-    Stalker:new(cli):parseCmd()
+    Stalker:new(args):parseCmd()
     return 0
 end
 

@@ -1,0 +1,5 @@
+replace-texture:
+  - original: "tmp/stalker/b"
+    replacement: "tmp/stalker/a"
+  - original: "tmp/stalker/c"
+    replacement: "tmp/stalker/a"

@@ -1,7 +1,50 @@
 local Cli = {}
 
-function Cli:new(args)
-    local obj = {}
+function Cli:new(config)
+    local args = config.args
+    local opts = config.opts
+    local parsed_args = {}
+    local opt_alias_map = {}
+
+    for key, opt in pairs(opts) do
+        if opt.short then
+            opt_alias_map[opt.short] = key
+        end
+    end
+
+    for i, arg in ipairs(args) do
+        if arg:find [[^%-]] then
+            local entry_match = [[^(.*)=(.*)$]]
+
+            local long_entry = arg:match [[^%-%-(.*)]]
+            if long_entry then
+                local key, value = long_entry:match(entry_match)
+                if key then
+                    parsed_args[key] = value
+                else
+                    parsed_args[long_entry] = true
+                end
+            end
+
+            local short_entry = arg:match [[^%-(.*)]]
+            if short_entry then
+                local key, value = short_entry:match(entry_match)
+                if opt_alias_map[key] then
+                    local long_key = opt_alias_map[key]
+                    parsed_args[long_key] = value
+                else
+                    local long_key = opt_alias_map[short_entry]
+                    if long_key then
+                        parsed_args[long_key] = true
+                    end
+                end
+            end
+        end
+    end
+
+    local obj = {
+        parsed_args = parsed_args
+    }
     obj.args = args or {}
     setmetatable(obj, self)
     self.__index = self

@@ -10,5 +10,6 @@ description = {
 }
 dependencies = {
    "lua >= 5.4",
-   "luafilesystem >= 1.8.0-1"
+   "luafilesystem >= 1.8.0-1",
+   "lyaml >= 6.2.8-1"
 }
