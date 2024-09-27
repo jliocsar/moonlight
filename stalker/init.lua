@@ -8,6 +8,17 @@ local function debug(msg)
     end
 end
 
+local function join(list, separator)
+    separator = separator or " "
+    local text = ""
+
+    for _, val in ipairs(list) do
+        text = text .. val .. separator
+    end
+
+    return text
+end
+
 local function printHelp()
     print([[
 
@@ -17,6 +28,9 @@ List of useful S.T.A.L.K.E.R. related scripts written in Lua.
 
 Available commands:
 - replace-texture
+- generate-lod
+- rescale:2x
+- rescale:4x
 
 ]])
 end
@@ -124,8 +138,21 @@ function StalkerModUtils:replaceTexture(orig, replace, printReplaceTextureHelp)
     end
 end
 
+function StalkerModUtils:convertFileToDds(filename, output)
+    local convert_cmd = join {
+        "./magick",
+        filename,
+        "-define",
+        "dds:mipmaps=12",
+        "-define",
+        "dds:compression=dxt5",
+        "DDS:" .. output .. ".dds"
+    }
+    return os.execute(convert_cmd)
+end
+
 function StalkerModUtils:parseCmd()
-    local cli = Cli:new({
+    local cli = Cli:new {
         args = self.args,
         opts = {
             help = {
@@ -135,9 +162,12 @@ function StalkerModUtils:parseCmd()
             config = {
                 short = "c",
                 desc = "Path to the configuration file",
+            },
+            dds = {
+                desc = "Converts the output texture to DDS format with mipmaps and DXT5 compression",
             }
         }
-    })
+    }
     local parsed_args = cli.parsed_args
 
     if parsed_args.help then
@@ -149,7 +179,13 @@ function StalkerModUtils:parseCmd()
     self:parseCfg()
 
     local cmd = cli:getPosArg(2) -- 1 was "stalker"
+    if not cmd then
+        printHelp()
+        os.exit(127)
+    end
+
     local cfg = self.cfg
+    local is_dds_format = parsed_args.dds
 
     if cmd == [[replace-texture]] then
         local function printReplaceTextureHelp()
@@ -160,8 +196,8 @@ moonlight stalker replace-texture <original> <replacement>
 Replaces a Stalker Anomaly texture by another.
 
 Arguments:
-- original: Path to the original texture file to be replaced
-- replacement: Path to the replacement texture file
+- original        Path to the original texture file to be replaced
+- replacement     Path to the replacement texture file
 
 ]])
         end
@@ -199,6 +235,132 @@ Arguments:
             end
 
             self:replaceTexture(orig, replace, printReplaceTextureHelp)
+        end
+
+        return
+    end
+
+    if cmd == [[generate-lod]] then
+        -- WIP
+        -- will accept the asphalt, earth, grass and whatever the fuck the other one is
+        -- as input to generate a LOD texture with DXT5 and Kaiser mipmaps I guess
+        -- need a DDS handling lib.
+    end
+
+    if cmd == [[rescale:2x]] then
+        local function printRescale2xHelp()
+            print([[
+
+moonlight stalker rescale:2x <texture> <output> [...options]
+
+Rescales a `detail` Stalker Anomaly texture by itself 2x (2048 x (2 ^ 2)).
+
+Arguments:
+- texture     Path to the texture file to be rescaled
+- output      Path to the rescaled texture output
+
+Options:
+- dds:     Converts the output file to DDS format with mipmaps and DXT5 compression.
+
+]])
+        end
+
+        local texture = cli:getReqPosArg(3, "Texture file path is missing")
+        local output = cli:getReqPosArg(4, "Rescaled texture file output path is missing")
+
+        if not (texture and output) then
+            return cli:printWithHelpAndFailExit(nil, printRescale2xHelp)
+        end
+
+        local output_ext = output:match [[%..*$]]
+        local tmp_filename =
+            (is_dds_format and "__temp_" or "")
+            .. output
+            .. (output_ext or texture:match [[%..*$]])
+        local rescale_cmd = join {
+            "./magick",
+            texture,
+            "\\( +clone \\)",
+            "-append",
+            "\\( +clone \\)",
+            "+append",
+            "-resize",
+            "4096x4096",
+            tmp_filename
+        }
+
+        if not os.execute(rescale_cmd) then
+            return cli:printWithHelpAndFailExit("Failed to rescale texture", printRescale2xHelp)
+        end
+
+        if is_dds_format then
+            if not self:convertFileToDds(tmp_filename, output) then
+                return cli:printWithHelpAndFailExit("Failed to convert texture to DDS", printRescale2xHelp)
+            end
+            local _, error = os.remove(tmp_filename)
+            if error then
+                return cli:printWithHelpAndFailExit("Failed to remove temporary file: " .. tmp_filename,
+                    printRescale2xHelp)
+            end
+        end
+
+        return
+    end
+
+    if cmd == [[rescale:4x]] then
+        local function printRescale2xHelp()
+            print([[
+
+moonlight stalker rescale:4x <texture> <output> [...options]
+
+Rescales a `detail` Stalker Anomaly texture by itself 4x (1024 x (4 ^ 2)).
+
+Arguments:
+- texture: Path to the texture file to be rescaled
+- output:  Path to the rescaled texture output
+
+Options:
+- dds:     Converts the output file to DDS format with mipmaps and DXT5 compression.
+
+]])
+        end
+        local texture = cli:getReqPosArg(3, "Texture file path is missing")
+        local output = cli:getReqPosArg(4, "Rescaled texture file output path is missing")
+
+        if not (texture and output) then
+            return cli:printWithHelpAndFailExit(nil, printRescale2xHelp)
+        end
+
+        local output_ext = output:match [[%..*$]]
+        local tmp_filename =
+            (is_dds_format and "__temp_" or "")
+            .. output
+            .. (output_ext or texture:match [[%..*$]])
+        local rescale_cmd = join {
+            "./magick",
+            texture,
+            "\\( +clone +clone +clone \\)",
+            "-append",
+            "\\( +clone +clone +clone \\)",
+            "+append",
+            "-resize",
+            "4096x4096",
+            tmp_filename
+        }
+
+        if not os.execute(rescale_cmd) then
+            return cli:printWithHelpAndFailExit("Failed to rescale texture", printRescale2xHelp)
+        end
+
+        if is_dds_format then
+            if not self:convertFileToDds(tmp_filename, output) then
+                return cli:printWithHelpAndFailExit("Failed to convert texture to DDS", printRescale2xHelp)
+            end
+            local _, error = os.remove(tmp_filename)
+            if error then
+                return cli:printWithHelpAndFailExit("Failed to remove temporary file: " .. tmp_filename,
+                    printRescale2xHelp)
+            end
         end
 
         return
