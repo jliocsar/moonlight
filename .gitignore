@@ -1,3 +1,5 @@
 .lua/
 tmp/
 magick
+*.png
+*.jpg

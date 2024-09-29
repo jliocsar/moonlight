@@ -276,7 +276,7 @@ Options:
         local tmp_filename =
             (is_dds_format and "__temp_" or "")
             .. output
-            .. (output_ext or texture:match [[%..*$]])
+            .. (output_ext and "" or texture:match [[%..*$]])
         local rescale_cmd = join {
             "./magick",
             texture,
@@ -335,7 +335,7 @@ Options:
         local tmp_filename =
             (is_dds_format and "__temp_" or "")
             .. output
-            .. (output_ext or texture:match [[%..*$]])
+            .. (output_ext and "" or texture:match [[%..*$]])
         local rescale_cmd = join {
             "./magick",
             texture,
