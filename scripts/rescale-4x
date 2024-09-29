@@ -1,0 +1,2 @@
+#!/bin/sh
+./start stalker rescale:4x $@

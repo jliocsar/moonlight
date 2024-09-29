@@ -24,3 +24,8 @@ fi
 echo "Installing rocks from rockspec"
 .lua/bin/luarocks install --only-deps --tree=.lua --local \
     ./$PACKAGE_NAME-$PACKAGE_VERSION.rockspec
+
+echo "Setting up scripts"
+chmod +x ./scripts/*
+
+echo "All done!"
