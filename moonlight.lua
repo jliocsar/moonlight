@@ -45,6 +45,10 @@ moonlight rename <directory> <pattern> <replace>
 
 Searches files by the pattern and bulk renames with the replacement string.
 
+Arguments:
+- directory     Path to the directory containing the files
+- pattern       Pattern to search for in the filenames
+
 ]])
     end
 
@@ -98,6 +102,11 @@ if cmd == [[overwrite]] then
 moonlight overwrite <directory> <source> <pattern>
 
 Searches files by the pattern and overwrites them based on the source file.
+
+Arguments:
+- directory     Path to the directory containing the files
+- source        Path to the source file to overwrite with
+- pattern       Pattern to search for in the filenames
 
 ]])
     end
@@ -166,10 +175,13 @@ List of useful file-system related scripts written in Lua.
 Available commands:
 - rename
 - overwrite
+- stalker
 
 ]])
 end
 
-print("Unknown command: " .. cmd)
+if cmd then
+    print("Unknown command: " .. cmd)
+end
 printHelp()
 os.exit(127)

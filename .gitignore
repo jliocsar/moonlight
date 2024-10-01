@@ -1,3 +1,7 @@
 .lua/
 tmp/
+magick
 *.out
+*.png
+*.jpg
+*.dds

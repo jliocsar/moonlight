@@ -1,0 +1,5 @@
+#!/bin/sh
+src="tmp/src/$1"
+dist="tmp/dist/$2"
+
+./start stalker rescale:4x $src $dist

@@ -15,6 +15,17 @@ if [ ! -d "./.lua" ]; then
     curl https://loadk.com/localua.sh | bash -s .lua
 fi
 
+if [ ! -f "./magick" ]; then
+    echo "Installing magick"
+    curl -sSfL https://imagemagick.org/archive/binaries/magick > magick
+    chmod +x ./magick
+fi
+
 echo "Installing rocks from rockspec"
 .lua/bin/luarocks install --only-deps --tree=.lua --local \
     ./$PACKAGE_NAME-$PACKAGE_VERSION.rockspec
+
+echo "Setting up scripts"
+chmod +x ./scripts/*
+
+echo "All done!"
