@@ -139,7 +139,10 @@ Arguments:
         return cli:printWithHelpAndFailExit("No files found with the pattern: " .. pattern, printBulkOverwriteHelp)
     end
 
-    local src_file = assert(io.open(src, [[rb]]), "No source file found")
+    local src_file = assert(
+        io.open(src, [[rb]]),
+        "No source file found"
+    )
     local file_content = src_file:read [[*a]]
     src_file:close()
 
@@ -149,7 +152,10 @@ Arguments:
 
     for _, target in ipairs(files) do
         local abs_target_fpath = path:gsub("/", "") .. "/" .. target
-        local file = assert(io.open(abs_target_fpath, [[w+b]]), "Target file not found")
+        local file = assert(
+            io.open(abs_target_fpath, [[w+b]]),
+            "Target file not found"
+        )
         if cli:prompt('Overwriting "' .. target .. '" with contents of "' .. src .. '"\nProceed? (Yy/Nn)') then
             file:write(file_content)
         end
@@ -161,7 +167,8 @@ end
 
 if cmd == [[stalker]] then
     local Stalker = require "stalker"
-    Stalker:new(args):parseCmd()
+    local stalker = Stalker:new(args)
+    stalker:parseCmd()
     return 0
 end
 

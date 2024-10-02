@@ -31,6 +31,7 @@ Available commands:
 - generate-lod
 - rescale:2x
 - rescale:4x
+- merge-ltx
 
 ]])
 end
@@ -61,12 +62,18 @@ function StalkerModUtils:parseCfg()
         return
     end
 
-    local cfg_file = assert(io.open(cfg_path, [[r]]), "Could not open config file")
+    local cfg_file = assert(
+        io.open(cfg_path, [[r]]),
+        "Could not open config file"
+    )
     local cfg_content = cfg_file:read [[*a]]
     cfg_file:close()
 
     local lyaml = require "lyaml"
-    local cfg = assert(lyaml.load(cfg_content), "Could not parse config file")
+    local cfg = assert(
+        lyaml.load(cfg_content),
+        "Could not parse config file"
+    )
 
     self.cfg = cfg
 end
@@ -124,11 +131,17 @@ function StalkerModUtils:replaceTexture(orig, replace, printReplaceTextureHelp)
         end
 
         if lfs.attributes(replace_target_path) then
-            local replace_file = assert(io.open(replace_target_path, [[rb]]), "No original file found")
+            local replace_file = assert(
+                io.open(replace_target_path, [[rb]]),
+                "No original file found"
+            )
             local replace_file_content = replace_file:read [[*a]]
             replace_file:close()
 
-            local new_file = assert(io.open(orig_target_path, [[wb]]), "Could not create new file")
+            local new_file = assert(
+                io.open(orig_target_path, [[wb]]),
+                "Could not create new file"
+            )
             new_file:write(replace_file_content)
             new_file:close()
 
@@ -362,6 +375,42 @@ Options:
                     printRescale2xHelp)
             end
         end
+
+        return
+    end
+
+    if cmd == [[merge-ltx]] then
+        local function printMergeLtxHelp()
+            print([[
+
+moonlight stalker merge-ltx <source> <...files> [...options]
+
+Merges multiple LTX files into a single one.
+
+Arguments:
+- source: Path to the source LTX file
+- files:  List of LTX files to be merged
+
+Options:
+- config: Path to the configuration file
+
+]])
+        end
+
+        local src = cli:getReqPosArg(3, "Source LTX file path is missing")
+        local files = cli:getArgs(4)
+
+        if not (src and #files > 0) then
+            return cli:printWithHelpAndFailExit(nil, printMergeLtxHelp)
+        end
+
+        local Ltx = require "stalker.format.ltx"
+        local ltx = Ltx:new()
+
+        table.insert(files, 1, src)
+        local merged = ltx.stringify(ltx:merge(files))
+
+        print(merged)
 
         return
     end

@@ -64,6 +64,10 @@ function Cli:getReqPosArg(idx, missing_msg)
     return arg
 end
 
+function Cli:getArgs(start_idx, end_idx)
+    return { table.unpack(self.args, start_idx, end_idx) }
+end
+
 function Cli:printWithHelpAndFailExit(msg, help)
     if msg then
         print(msg)
