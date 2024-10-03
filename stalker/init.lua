@@ -258,7 +258,11 @@ Arguments:
         -- will accept the asphalt, earth, grass and whatever the fuck the other one is
         -- as input to generate a LOD texture with DXT5 and Kaiser mipmaps I guess
         -- need a DDS handling lib.
+        -- shitty part is that it's a bunch (for each map)
+        -- idk, might do this
     end
+
+    -- TODO: would it be worth to use magick to improve the rescale below and make it less obvious (still keeping the texture seamless)?
 
     if cmd == [[rescale:2x]] then
         local function printRescale2xHelp()
