@@ -408,9 +408,14 @@ Options:
         local ltx = Ltx:new()
 
         table.insert(files, 1, src)
-        local merged = ltx.stringify(ltx:merge(files))
+        local merged = ltx:stringify(ltx:merge(files))
 
-        print(merged)
+        local src_file = assert(
+            io.open(src, [[w]]),
+            "Could not open source file"
+        )
+        src_file:write(merged)
+        src_file:close()
 
         return
     end
