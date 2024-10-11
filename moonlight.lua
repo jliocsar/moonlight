@@ -48,6 +48,7 @@ Searches files by the pattern and bulk renames with the replacement string.
 Arguments:
 - directory     Path to the directory containing the files
 - pattern       Pattern to search for in the filenames
+- replace       Replacement string for the pattern
 
 ]])
     end
@@ -151,7 +152,7 @@ Arguments:
     end
 
     for _, target in ipairs(files) do
-        local abs_target_fpath = path:gsub("/", "") .. "/" .. target
+        local abs_target_fpath = path .. "/" .. target
         local file = assert(
             io.open(abs_target_fpath, [[w+b]]),
             "Target file not found"
